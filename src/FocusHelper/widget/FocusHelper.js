@@ -42,7 +42,7 @@ define([
     "use strict";
 
     // Declare widget's prototype.
-    return declare("FocusHelper.widget.FocusHelper", [ _WidgetBase, _TemplatedMixin ], {
+    return declare("FocusHelper.widget.FocusHelper", [_WidgetBase, _TemplatedMixin], {
         // _TemplatedMixin will create our dom node using this HTML template.
         templateString: widgetTemplate,
 
@@ -90,15 +90,15 @@ define([
                 this._readOnly = true;
                 // the dataview is readonly so delete everything in advance
             } else {
-                this._pageLoadListener = this.connect(this.mxform, "onNavigation", dojoLang.hitch(this,this._onPageLoad));
+                this._pageLoadListener = this.connect(this.mxform, "onNavigation", dojoLang.hitch(this, this._onPageLoad));
 
                 this._updateRendering();
                 this._setupEvents();
             }
 
-            
 
-            
+
+
         },
 
         // mxui.widget._WidgetBase.update is called when context is changed or initialized. Implement to re-render and / or fetch data.
@@ -119,22 +119,22 @@ define([
                 this._updateRendering(callback); // We're passing the callback to updateRendering to be called after DOM-manipulation
             }
 
-            
+
         },
 
         // mxui.widget._WidgetBase.enable is called when the widget should enable editing. Implement to enable editing if widget is input widget.
         enable: function () {
-          //logger.debug(this.id + ".enable");
+            //logger.debug(this.id + ".enable");
         },
 
         // mxui.widget._WidgetBase.enable is called when the widget should disable editing. Implement to disable editing if widget is input widget.
         disable: function () {
-          //logger.debug(this.id + ".disable");
+            //logger.debug(this.id + ".disable");
         },
 
         // mxui.widget._WidgetBase.resize is called when the page's layout is recalculated. Implement to do sizing calculations. Prefer using CSS instead.
         resize: function (box) {
-          //logger.debug(this.id + ".resize");
+            //logger.debug(this.id + ".resize");
         },
 
         // mxui.widget._WidgetBase.uninitialize is called when the widget is destroyed. Implement to do special tear-down work.
@@ -157,12 +157,12 @@ define([
         },
 
         // set the focus on the element
-        _setFocusOnInput(inputNode) { 
+        _setFocusOnInput(inputNode) {
             inputNode.focus();
             this._setFocus = false;
 
             if (this.mfAfterFocus !== "") {
-                this._execMf(this.mfAfterFocus,this._contextObj.getGuid());
+                this._execMf(this.mfAfterFocus, this._contextObj.getGuid());
             }
         },
 
@@ -172,9 +172,9 @@ define([
         },
 
         // logic triggered page load event - note: not triggered if conditional visiblity is used
-        _onPageLoad: function(event) {
+        _onPageLoad: function (event) {
             var formField;
-            
+
             // get rid of the event on the pageload
             this.disconnect(this._pageLoadListener);
             this._pageLoadListener = null;
@@ -190,7 +190,7 @@ define([
                     if (this._setFocus && !this._readOnly && !this._globalReadOnly) {
                         this._setFocusOnInput(this._targetFormField);
                     }
-                }                
+                }
             } else {
                 // this scenario could happen if we have a static form control / text only: do nothing
                 // this._globalReadOnly = true; 
@@ -199,7 +199,7 @@ define([
         },
 
         // method for finding the parent field, returns target object
-        _findTargetField: function(searchName) {
+        _findTargetField: function (searchName) {
             var result;
 
             // find the node
@@ -207,11 +207,11 @@ define([
             result = result[0];
 
             return result;
-            
+
         },
 
         // method for finding the input fields node and already checking the dijitwidget
-        _findInputField: function(parentNode) {
+        _findInputField: function (parentNode) {
             var result;
             // first check the parentNode itself
             if (dojoClass.contains(parentNode, "form-control")) {
@@ -234,7 +234,7 @@ define([
                 result = null;
             }
             return result;
-        }, 
+        },
 
         _execMf: function (mf, guid, cb) {
             logger.debug(this.id + "._execMf");
@@ -279,7 +279,7 @@ define([
                     if (this._targetNameNode !== null && this._targetNameNode !== undefined) {
                         // check if element allready is the formcontrol
                         formField = this._findInputField(this._targetNameNode);
-        
+
                         // does our formField already exist?
                         if (formField !== null) {
                             this._targetFormField = formField;
@@ -287,17 +287,17 @@ define([
                                 this._setFocusOnInput(this._targetFormField);
                             }
                         }
-                    }            
+                    }
                 }
             }
 
 
             // The callback, coming from update, needs to be executed, to let the page know it finished rendering
             this._executeCallback(callback, "_updateRendering");
-        }, 
+        },
 
         // get rid of all events and handles
-        _unsubscribeEvents: function() {
+        _unsubscribeEvents: function () {
             this.unsubscribeAll();
         },
 
@@ -312,7 +312,7 @@ define([
                 this.subscribe({
                     guid: this._contextObj.getGuid(),
                     callback: dojoLang.hitch(this, function (guid) {
-                        this._updateRendering(function(){});
+                        this._updateRendering(function () { });
                     })
                 });
 
@@ -320,7 +320,7 @@ define([
                     guid: this._contextObj.getGuid(),
                     attr: this.initializeFocusAttr,
                     callback: dojoLang.hitch(this, function (guid, attr, attrValue) {
-                        this._updateRendering(function(){});
+                        this._updateRendering(function () { });
                     })
                 });
             }
