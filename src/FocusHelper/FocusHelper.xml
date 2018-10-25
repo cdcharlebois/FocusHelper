@@ -6,17 +6,22 @@
     <icon>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsSAAALEgHS3X78AAAA2ElEQVRYhWP8//8/w0ACpgG1nYGBgQWZ47nxRwADA8MEBgYGeVpbvN2fgxHFAVDL19PaYnSAHAIgnzMo8TMyxKizMFhKMtPFAeA04LnxhwAs2OlpOdwByICeloMAPBt6bvwBZmz350BREBYWhteAVatWkW03iBhc2RAbQPYhLDQo8DUGGPAQGHXAqANGHTDqgFEHjDqAYG2IrT2ALEZpzTi02gO0ABghcPz5X5paiA6QHfAQRCy5+YeujkBulNK1YwLrGTEhCWxgYGAIhIUEvcAI7x0zMDAAAE29ObxoeE5LAAAAAElFTkSuQmCC</icon>
 
     <properties>
-        <property key="targetName" type="string" required="true" defaultValue="">
-            <caption>Target formfield</caption>
-            <category>General</category>
-            <description>Enter the name of the formfield that needs to be receive focus.</description>
+        <property key="executeImmediately" type="boolean" defaultValue="true">
+          <caption>Execute Immediately</caption>
+          <category>General</category>
+          <description>Should the focus be set when the widget loads?</description>
         </property>
-        <property key="formContext" type="entity" required="true">
+        <property key="targetName" type="string" required="true" defaultValue="">
+            <caption>Class to Target</caption>
+            <category>General</category>
+            <description>Enter the class to target. (The widget will target the first `input` element inside the matching element).</description>
+        </property>
+        <property key="formContext" type="entity" allowNonPersistableEntities="true" required="false">
              <caption>Form context object</caption>
              <category>Data source</category>
              <description>The context object that will be monitored.</description>
         </property>
-        <property key="initializeFocusAttr" type="attribute" entityProperty="formContext" required="true">
+        <property key="initializeFocusAttr" type="attribute" entityProperty="formContext" required="false">
             <caption>Initialze attribute</caption>
             <category>Data source</category>
             <description>The boolean attribute that, if set to true will trigger the focus.</description>

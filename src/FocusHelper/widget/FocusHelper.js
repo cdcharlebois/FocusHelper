@@ -53,6 +53,7 @@ define([
         formContext: "",
         initializeFocusAttr: "",
         mfAfterFocus: "",
+        executeImmediately: null,
 
         // Internal variables. Non-primitives created in the prototype are shared between all widget instances.
         _handles: null,
@@ -80,9 +81,9 @@ define([
             this._readOnly = false;
             this._widgetReadOnly = false;
 
-            if (this.targetName && this.targetName !== "") {
-                this.targetName = ".mx-name-" + this.targetName;
-            }
+            // if (this.targetName && this.targetName !== "") {
+            //     this.targetName = ".mx-name-" + this.targetName;
+            // }
 
             // if the entire dataview is readonly, this widget should not trigger
             if (this.readOnly || this.get("disabled") || this.readonly) {
@@ -92,13 +93,9 @@ define([
             } else {
                 this._pageLoadListener = this.connect(this.mxform, "onNavigation", dojoLang.hitch(this, this._onPageLoad));
 
-                this._updateRendering();
-                this._setupEvents();
+                // this._updateRendering();
+                // this._setupEvents();
             }
-
-
-
-
         },
 
         // mxui.widget._WidgetBase.update is called when context is changed or initialized. Implement to re-render and / or fetch data.
@@ -106,6 +103,10 @@ define([
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
+
+            if (this.executeImmediately) {
+                this._waitForDomNode(this.targetName + " input", this.domNode.parentElement, 10, this._setFocusOnInput.bind(this));
+            }
 
             // destroy the domnode as we don't need it.
             if (this.domNode) {
@@ -331,6 +332,20 @@ define([
             if (cb && typeof cb === "function") {
                 cb();
             }
+        },
+
+        _waitForDomNode: function (query, start, attempts, callback) {
+            var countdown = attempts;
+            var wait = setInterval(function () {
+                var q = start.querySelector(query);
+                if (q || countdown <= 0) {
+                    clearInterval(wait);
+                    console.log('clearing interval');
+                    callback(q);
+                } else {
+                    countdown--;
+                }
+            }.bind(this), 100)
         }
     });
 });
