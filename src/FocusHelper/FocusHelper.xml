@@ -12,9 +12,9 @@
           <description>Should the focus be set when the widget loads?</description>
         </property>
         <property key="targetName" type="string" required="true" defaultValue="">
-            <caption>Class to Target</caption>
+            <caption>Target Query</caption>
             <category>General</category>
-            <description>Enter the class to target. (The widget will target the first `input` element inside the matching element).</description>
+            <description>Should be a valid CSS selector. (The widget will target the first `input` element inside the matching element, and it only targets siblings of this widget).</description>
         </property>
         <property key="formContext" type="entity" allowNonPersistableEntities="true" required="false">
              <caption>Form context object</caption>

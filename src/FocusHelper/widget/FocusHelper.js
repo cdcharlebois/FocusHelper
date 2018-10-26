@@ -19,32 +19,15 @@
 define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
-    "dijit/_TemplatedMixin",
-
-    "mxui/dom",
-    "dojo/dom",
-    "dojo/dom-prop",
-    "dojo/dom-geometry",
-    "dojo/dom-class",
-    "dojo/dom-attr",
     "dojo/query",
-    "dojo/NodeList-traverse",
-    "dojo/dom-style",
-    "dojo/dom-construct",
-    "dojo/_base/array",
     "dojo/_base/lang",
-    "dojo/text",
-    "dojo/html",
-    "dojo/_base/event",
-
-    "dojo/text!FocusHelper/widget/template/FocusHelper.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoAttr, dojoQuery, dojoTraverse, dojoStyle, dojoConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, widgetTemplate) {
+], function (declare, _WidgetBase, dojoQuery, dojoLang) {
     "use strict";
 
     // Declare widget's prototype.
-    return declare("FocusHelper.widget.FocusHelper", [_WidgetBase, _TemplatedMixin], {
+    return declare("FocusHelper.widget.FocusHelper", [_WidgetBase], {
         // _TemplatedMixin will create our dom node using this HTML template.
-        templateString: widgetTemplate,
+        // templateString: widgetTemplate,
 
         // DOM elements
 
@@ -72,29 +55,18 @@ define([
             this._handles = [];
             this._setFocus = false;
             this._readOnly = false;
+            this._widgetReadOnly = false;
         },
 
         // dijit._WidgetBase.postCreate is called after constructing the widget. Implement to do extra setup work.
         postCreate: function () {
             logger.debug(this.id + ".postCreate");
-            this._setFocus = false;
-            this._readOnly = false;
-            this._widgetReadOnly = false;
-
-            // if (this.targetName && this.targetName !== "") {
-            //     this.targetName = ".mx-name-" + this.targetName;
-            // }
 
             // if the entire dataview is readonly, this widget should not trigger
             if (this.readOnly || this.get("disabled") || this.readonly) {
                 this._globalReadOnly = true;
                 this._readOnly = true;
                 // the dataview is readonly so delete everything in advance
-            } else {
-                this._pageLoadListener = this.connect(this.mxform, "onNavigation", dojoLang.hitch(this, this._onPageLoad));
-
-                // this._updateRendering();
-                // this._setupEvents();
             }
         },
 
@@ -108,10 +80,6 @@ define([
                 this._waitForDomNode(this.targetName + " input", this.domNode.parentElement, 10, this._setFocusOnInput.bind(this));
             }
 
-            // destroy the domnode as we don't need it.
-            if (this.domNode) {
-                dojoConstruct.destroy(this.domNode);
-            }
             // if global dataview is readonly then do nothing
             if (this._globalReadOnly) {
                 this._executeCallback(callback, "postCreate");
@@ -123,40 +91,6 @@ define([
 
         },
 
-        // mxui.widget._WidgetBase.enable is called when the widget should enable editing. Implement to enable editing if widget is input widget.
-        enable: function () {
-            //logger.debug(this.id + ".enable");
-        },
-
-        // mxui.widget._WidgetBase.enable is called when the widget should disable editing. Implement to disable editing if widget is input widget.
-        disable: function () {
-            //logger.debug(this.id + ".disable");
-        },
-
-        // mxui.widget._WidgetBase.resize is called when the page's layout is recalculated. Implement to do sizing calculations. Prefer using CSS instead.
-        resize: function (box) {
-            //logger.debug(this.id + ".resize");
-        },
-
-        // mxui.widget._WidgetBase.uninitialize is called when the widget is destroyed. Implement to do special tear-down work.
-        uninitialize: function () {
-            logger.debug(this.id + ".uninitialize");
-
-            if (this._pageLoadListener) {
-                this.disconnect(this._pageLoadListener);
-                this._pageLoadListener = null;
-            }
-            // Clean up listeners, helper objects, etc. There is no need to remove listeners added with this.connect / this.subscribe / this.own.
-        },
-
-        // We want to stop events on a mobile device
-        _stopBubblingEventOnMobile: function (e) {
-            logger.debug(this.id + "._stopBubblingEventOnMobile");
-            if (typeof document.ontouchstart !== "undefined") {
-                dojoEvent.stop(e);
-            }
-        },
-
         // set the focus on the element
         _setFocusOnInput(inputNode) {
             inputNode.focus();
@@ -164,38 +98,6 @@ define([
 
             if (this.mfAfterFocus !== "") {
                 this._execMf(this.mfAfterFocus, this._contextObj.getGuid());
-            }
-        },
-
-        // Attach events to HTML dom elements
-        _setupEvents: function () {
-            //logger.debug(this.id + "._setupEvents");
-        },
-
-        // logic triggered page load event - note: not triggered if conditional visiblity is used
-        _onPageLoad: function (event) {
-            var formField;
-
-            // get rid of the event on the pageload
-            this.disconnect(this._pageLoadListener);
-            this._pageLoadListener = null;
-
-            // find the formfield domnode
-            this._targetNameNode = this._findTargetField(this.targetName);
-            if (this._targetNameNode !== null && this._targetNameNode !== undefined) {
-                // check if element allready is the formcontrol
-                formField = this._findInputField(this._targetNameNode);
-
-                if (formField !== null && formField !== undefined) {
-                    this._targetFormField = formField;
-                    if (this._setFocus && !this._readOnly && !this._globalReadOnly) {
-                        this._setFocusOnInput(this._targetFormField);
-                    }
-                }
-            } else {
-                // this scenario could happen if we have a static form control / text only: do nothing
-                // this._globalReadOnly = true; 
-                logger.debug(this.id + " could not find the target formfield");
             }
         },
 
@@ -213,28 +115,8 @@ define([
 
         // method for finding the input fields node and already checking the dijitwidget
         _findInputField: function (parentNode) {
-            var result;
-            // first check the parentNode itself
-            if (dojoClass.contains(parentNode, "form-control")) {
-                result = parentNode;
-            } else {
-                result = dojoQuery(".form-control", parentNode)[0];
-            }
-            if (result !== null && result !== undefined) {
-                this._targetDijitWidget = dijit.byNode(result);
-                // if the targetDijit is undefined it could also mean we need its parent
-                if (this._targetDijitWidget === null || this._targetDijitWidget === undefined) {
-                    this._targetDijitWidget = dijit.byNode(dojoQuery(result).parent()[0]);
-                }
-                if (this._targetDijitWidget && this._targetDijitWidget.hasOwnProperty('readOnly')) {
-                    this._readOnly = true;
-                }
-            } else {
-                // return a null
-                logger.debug(this.id + "could not find an editable formfield to focus on");
-                result = null;
-            }
-            return result;
+            // return this._waitForDomNode('input', parentNode, 10, function(r){ return r} );
+            return dojoQuery('input', parentNode)[0];
         },
 
         _execMf: function (mf, guid, cb) {
@@ -297,16 +179,11 @@ define([
             this._executeCallback(callback, "_updateRendering");
         },
 
-        // get rid of all events and handles
-        _unsubscribeEvents: function () {
-            this.unsubscribeAll();
-        },
-
         // Reset subscriptions.
         _resetSubscriptions: function () {
             logger.debug(this.id + "._resetSubscriptions");
             // Release handles on previous object, if any and reset events
-            this._unsubscribeEvents();
+            this.unsubscribeAll();
 
             // When a mendix object exists create subscribtions.
             if (this._contextObj) {
